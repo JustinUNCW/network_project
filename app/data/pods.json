@@ -1,638 +1,642 @@
-[
-    {
-        "data": 
-                [
-                    {
-                        "id": "1010",
-                        "assets": [
-                            {
-                                "name": "F241.01.04-N9K-92160YC-X",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.163"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "04",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.163",
-                                            "parent": {
-                                                "network": "10.122.190.160/28",
-                                                "gateway": "10.122.190.161"
-                                            }
-                                        }
-                                    }
-                                ]
+
+{
+    "id": "78be672f7657f8708e37a3007542170d", 
+    "name": "F241", 
+    "location": "Apex, NC", 
+    "building": "803 New Derby ln", 
+    "floor": "0", 
+    "pods":
+            [
+                {
+                    "id": "1010",
+                    "assets": [
+                        {
+                            "name": "F241.01.04-N9K-92160YC-X",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.163"
+                                }
+                            ],
+                            "location": {
+                                "row": "04",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.04-N9K-9372PX-E",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.162"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "04",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.162",
-                                            "parent": {
-                                                "network": "10.122.190.160/28",
-                                                "gateway": "10.122.190.161"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.163",
+                                        "parent": {
+                                            "network": "10.122.190.160/28",
+                                            "gateway": "10.122.190.161"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.04-N9K-9372PX-E",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.162"
+                                }
+                            ],
+                            "location": {
+                                "row": "04",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.04-N9K-9396PX",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.164"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "04",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.164",
-                                            "parent": {
-                                                "network": "10.122.190.160/28",
-                                                "gateway": "10.122.190.161"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.162",
+                                        "parent": {
+                                            "network": "10.122.190.160/28",
+                                            "gateway": "10.122.190.161"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.04-N9K-9396PX",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.164"
+                                }
+                            ],
+                            "location": {
+                                "row": "04",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.04-N9K-9504-1",
-                                "description": "Do not change the default credentials. Starting with release 10.1(1), the N9K-X9464PX and N9K-C9504-FM modules in this chassis are no longer supported. Reference document:https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/101x/release-notes/cisco-nexus-9000-nxos-release-notes-1011.html",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.165"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "04",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.165",
-                                            "parent": {
-                                                "network": "10.122.190.160/28",
-                                                "gateway": "10.122.190.161"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.164",
+                                        "parent": {
+                                            "network": "10.122.190.160/28",
+                                            "gateway": "10.122.190.161"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.04-N9K-9504-1",
+                            "description": "Do not change the default credentials. Starting with release 10.1(1), the N9K-X9464PX and N9K-C9504-FM modules in this chassis are no longer supported. Reference document:https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/101x/release-notes/cisco-nexus-9000-nxos-release-notes-1011.html",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.165"
+                                }
+                            ],
+                            "location": {
+                                "row": "04",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.04-N9K-9504-2",
-                                "description": "Do not change the default credentials. Starting with release 10.1(1), the N9K-X9464PX and N9K-C9504-FM modules in this chassis are no longer supported. Reference document:https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/101x/release-notes/cisco-nexus-9000-nxos-release-notes-1011.html",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.166"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "04",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.166",
-                                            "parent": {
-                                                "network": "10.122.190.160/28",
-                                                "gateway": "10.122.190.161"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.165",
+                                        "parent": {
+                                            "network": "10.122.190.160/28",
+                                            "gateway": "10.122.190.161"
                                         }
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "1011",
-                        "assets": [
-                            {
-                                "name": "F241.01.01-9508",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.194"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "01",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.194",
-                                            "parent": {
-                                                "network": "10.122.190.192/28",
-                                                "gateway": "10.122.190.193"
-                                            }
-                                        }
-                                    }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.04-N9K-9504-2",
+                            "description": "Do not change the default credentials. Starting with release 10.1(1), the N9K-X9464PX and N9K-C9504-FM modules in this chassis are no longer supported. Reference document:https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/101x/release-notes/cisco-nexus-9000-nxos-release-notes-1011.html",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.166"
+                                }
+                            ],
+                            "location": {
+                                "row": "04",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.01-93108TC-FX-2",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.196"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "01",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.196",
-                                            "parent": {
-                                                "network": "10.122.190.192/28",
-                                                "gateway": "10.122.190.193"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.166",
+                                        "parent": {
+                                            "network": "10.122.190.160/28",
+                                            "gateway": "10.122.190.161"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "1011",
+                    "assets": [
+                        {
+                            "name": "F241.01.01-9508",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.194"
+                                }
+                            ],
+                            "location": {
+                                "row": "01",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.01-93108TC-FX-1",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.195"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "01",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.195",
-                                            "parent": {
-                                                "network": "10.122.190.192/28",
-                                                "gateway": "10.122.190.193"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.194",
+                                        "parent": {
+                                            "network": "10.122.190.192/28",
+                                            "gateway": "10.122.190.193"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.01-93108TC-FX-2",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.196"
+                                }
+                            ],
+                            "location": {
+                                "row": "01",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.02-9348GC-FXP-1",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.198"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "02",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.198",
-                                            "parent": {
-                                                "network": "10.122.190.192/28",
-                                                "gateway": "10.122.190.193"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.196",
+                                        "parent": {
+                                            "network": "10.122.190.192/28",
+                                            "gateway": "10.122.190.193"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.01-93108TC-FX-1",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.195"
+                                }
+                            ],
+                            "location": {
+                                "row": "01",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.02-9348GC-FXP-2",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.199"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "02",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.199",
-                                            "parent": {
-                                                "network": "10.122.190.192/28",
-                                                "gateway": "10.122.190.193"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.195",
+                                        "parent": {
+                                            "network": "10.122.190.192/28",
+                                            "gateway": "10.122.190.193"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.02-9348GC-FXP-1",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.198"
+                                }
+                            ],
+                            "location": {
+                                "row": "02",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.02-9508",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.197"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "02",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.197",
-                                            "parent": {
-                                                "network": "10.122.190.192/28",
-                                                "gateway": "10.122.190.193"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.198",
+                                        "parent": {
+                                            "network": "10.122.190.192/28",
+                                            "gateway": "10.122.190.193"
                                         }
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "1012",
-                        "assets": [
-                            {
-                                "name": "F241.01.10-N9508",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.189.250"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "10",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.189.250",
-                                            "parent": {
-                                                "network": "10.122.189.224/27",
-                                                "gateway": "10.122.189.225"
-                                            }
-                                        }
-                                    }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.02-9348GC-FXP-2",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.199"
+                                }
+                            ],
+                            "location": {
+                                "row": "02",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.11-C93180YC-EX",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.189.251"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "11",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.189.251",
-                                            "parent": {
-                                                "network": "10.122.189.224/27",
-                                                "gateway": "10.122.189.225"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.199",
+                                        "parent": {
+                                            "network": "10.122.190.192/28",
+                                            "gateway": "10.122.190.193"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.02-9508",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.197"
+                                }
+                            ],
+                            "location": {
+                                "row": "02",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.11-N7706",
-                                "description": "Do not change the default credentials.\nCisco NX-OS Software Release 8.3.1 or later for use of F4 card.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.189.252"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "11",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.189.252",
-                                            "parent": {
-                                                "network": "10.122.189.224/27",
-                                                "gateway": "10.122.189.225"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.197",
+                                        "parent": {
+                                            "network": "10.122.190.192/28",
+                                            "gateway": "10.122.190.193"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "1012",
+                    "assets": [
+                        {
+                            "name": "F241.01.10-N9508",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.189.250"
+                                }
+                            ],
+                            "location": {
+                                "row": "10",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.10-N7706",
-                                "description": "Do not change the default credentials.\nCisco NX-OS Software Release 8.3.1 or later for use of F4 card.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.189.249"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "10",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.189.249",
-                                            "parent": {
-                                                "network": "10.122.189.224/27",
-                                                "gateway": "10.122.189.225"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.189.250",
+                                        "parent": {
+                                            "network": "10.122.189.224/27",
+                                            "gateway": "10.122.189.225"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.11-C93180YC-EX",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.189.251"
+                                }
+                            ],
+                            "location": {
+                                "row": "11",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.10-C93180YC-EX",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.189.248"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "10",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.189.248",
-                                            "parent": {
-                                                "network": "10.122.189.224/27",
-                                                "gateway": "10.122.189.225"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.189.251",
+                                        "parent": {
+                                            "network": "10.122.189.224/27",
+                                            "gateway": "10.122.189.225"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.11-N7706",
+                            "description": "Do not change the default credentials.\nCisco NX-OS Software Release 8.3.1 or later for use of F4 card.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.189.252"
+                                }
+                            ],
+                            "location": {
+                                "row": "11",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "F241.01.11-N9508",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.189.253"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "11",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.189.253",
-                                            "parent": {
-                                                "network": "10.122.189.224/27",
-                                                "gateway": "10.122.189.225"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.189.252",
+                                        "parent": {
+                                            "network": "10.122.189.224/27",
+                                            "gateway": "10.122.189.225"
                                         }
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "1015",
-                        "assets": [
-                            {
-                                "name": "C2900-1",
-                                "description": "please do not change credentials",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.207.165.124"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "03",
-                                    "aisle": "21"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.207.165.124",
-                                            "parent": {
-                                                "network": "10.207.165.120/29",
-                                                "gateway": "10.207.165.121"
-                                            }
-                                        }
-                                    }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.10-N7706",
+                            "description": "Do not change the default credentials.\nCisco NX-OS Software Release 8.3.1 or later for use of F4 card.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.189.249"
+                                }
+                            ],
+                            "location": {
+                                "row": "10",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "ASA5512",
-                                "description": "please do not change credentials",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.207.165.123"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "03",
-                                    "aisle": "21"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.207.165.123",
-                                            "parent": {
-                                                "network": "10.207.165.120/29",
-                                                "gateway": "10.207.165.121"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.189.249",
+                                        "parent": {
+                                            "network": "10.122.189.224/27",
+                                            "gateway": "10.122.189.225"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.10-C93180YC-EX",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.189.248"
+                                }
+                            ],
+                            "location": {
+                                "row": "10",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "C2900-2",
-                                "description": "please do not change credentials",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.207.165.125"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "03",
-                                    "aisle": "21"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.207.165.125",
-                                            "parent": {
-                                                "network": "10.207.165.120/29",
-                                                "gateway": "10.207.165.121"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.189.248",
+                                        "parent": {
+                                            "network": "10.122.189.224/27",
+                                            "gateway": "10.122.189.225"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.11-N9508",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.189.253"
+                                }
+                            ],
+                            "location": {
+                                "row": "11",
+                                "aisle": "01"
                             },
-                            {
-                                "name": "WS-C3650",
-                                "description": "please do not change credentials",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.207.165.122"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "03",
-                                    "aisle": "21"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.207.165.122",
-                                            "parent": {
-                                                "network": "10.207.165.120/29",
-                                                "gateway": "10.207.165.121"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.189.253",
+                                        "parent": {
+                                            "network": "10.122.189.224/27",
+                                            "gateway": "10.122.189.225"
                                         }
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "1022",
-                        "assets": [
-                            {
-                                "name": "F241.01.01-N3K-2",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.51"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "01",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.51",
-                                            "parent": {
-                                                "network": "10.122.190.32/27",
-                                                "gateway": "10.122.190.33"
-                                            }
-                                        }
-                                    }
-                                ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "1015",
+                    "assets": [
+                        {
+                            "name": "C2900-1",
+                            "description": "please do not change credentials",
+                            "accessMethods": [
+                                {
+                                    "url": "10.207.165.124"
+                                }
+                            ],
+                            "location": {
+                                "row": "03",
+                                "aisle": "21"
                             },
-                            {
-                                "name": "F241.01.01-FPR-1",
-                                "description": "Do not change the default credentials.\n\nEth1/8 used for FTD Management, available IP: 10.122.190.52",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.48"
-                                    },
-                                    {
-                                        "url": "10.122.190.48"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "01",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.48",
-                                            "parent": {
-                                                "network": "10.122.190.32/27",
-                                                "gateway": "10.122.190.33"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.207.165.124",
+                                        "parent": {
+                                            "network": "10.207.165.120/29",
+                                            "gateway": "10.207.165.121"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "ASA5512",
+                            "description": "please do not change credentials",
+                            "accessMethods": [
+                                {
+                                    "url": "10.207.165.123"
+                                }
+                            ],
+                            "location": {
+                                "row": "03",
+                                "aisle": "21"
                             },
-                            {
-                                "name": "F241.01.01-N3K-1",
-                                "description": "Do not change the default credentials.",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.50"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "01",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.50",
-                                            "parent": {
-                                                "network": "10.122.190.32/27",
-                                                "gateway": "10.122.190.33"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.207.165.123",
+                                        "parent": {
+                                            "network": "10.207.165.120/29",
+                                            "gateway": "10.207.165.121"
                                         }
                                     }
-                                ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "C2900-2",
+                            "description": "please do not change credentials",
+                            "accessMethods": [
+                                {
+                                    "url": "10.207.165.125"
+                                }
+                            ],
+                            "location": {
+                                "row": "03",
+                                "aisle": "21"
                             },
-                            {
-                                "name": "F241.01.01-FPR-2",
-                                "description": "Do not change the default credentials.\n\nEth1/8 used for FTD Management, available IP: 10.122.190.53",
-                                "accessMethods": [
-                                    {
-                                        "url": "10.122.190.49"
-                                    },
-                                    {
-                                        "url": "10.122.190.49"
-                                    }
-                                ],
-                                "location": {
-                                    "row": "01",
-                                    "aisle": "01"
-                                },
-                                "ports": [
-                                    {
-                                        "interface": {
-                                            "address": "10.122.190.49",
-                                            "parent": {
-                                                "network": "10.122.190.32/27",
-                                                "gateway": "10.122.190.33"
-                                            }
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.207.165.125",
+                                        "parent": {
+                                            "network": "10.207.165.120/29",
+                                            "gateway": "10.207.165.121"
                                         }
                                     }
-                                ]
-                            }
-                     ]
-            }
-        ]
-    }
-]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "WS-C3650",
+                            "description": "please do not change credentials",
+                            "accessMethods": [
+                                {
+                                    "url": "10.207.165.122"
+                                }
+                            ],
+                            "location": {
+                                "row": "03",
+                                "aisle": "21"
+                            },
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.207.165.122",
+                                        "parent": {
+                                            "network": "10.207.165.120/29",
+                                            "gateway": "10.207.165.121"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "1022",
+                    "assets": [
+                        {
+                            "name": "F241.01.01-N3K-2",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.51"
+                                }
+                            ],
+                            "location": {
+                                "row": "01",
+                                "aisle": "01"
+                            },
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.51",
+                                        "parent": {
+                                            "network": "10.122.190.32/27",
+                                            "gateway": "10.122.190.33"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.01-FPR-1",
+                            "description": "Do not change the default credentials.\n\nEth1/8 used for FTD Management, available IP: 10.122.190.52",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.48"
+                                },
+                                {
+                                    "url": "10.122.190.48"
+                                }
+                            ],
+                            "location": {
+                                "row": "01",
+                                "aisle": "01"
+                            },
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.48",
+                                        "parent": {
+                                            "network": "10.122.190.32/27",
+                                            "gateway": "10.122.190.33"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.01-N3K-1",
+                            "description": "Do not change the default credentials.",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.50"
+                                }
+                            ],
+                            "location": {
+                                "row": "01",
+                                "aisle": "01"
+                            },
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.50",
+                                        "parent": {
+                                            "network": "10.122.190.32/27",
+                                            "gateway": "10.122.190.33"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "F241.01.01-FPR-2",
+                            "description": "Do not change the default credentials.\n\nEth1/8 used for FTD Management, available IP: 10.122.190.53",
+                            "accessMethods": [
+                                {
+                                    "url": "10.122.190.49"
+                                },
+                                {
+                                    "url": "10.122.190.49"
+                                }
+                            ],
+                            "location": {
+                                "row": "01",
+                                "aisle": "01"
+                            },
+                            "ports": [
+                                {
+                                    "interface": {
+                                        "address": "10.122.190.49",
+                                        "parent": {
+                                            "network": "10.122.190.32/27",
+                                            "gateway": "10.122.190.33"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+        }
+    ]
+}
