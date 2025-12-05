@@ -7,11 +7,13 @@ import json
 
 router = APIRouter(
     prefix="/upload", 
-    tags=["Uploads"]
+    tags=["Bulk"]
 )
 
-@router.post("/dump")
+@router.post("/bulk")
 async def upload_pod_dump(file: UploadFile = File()):
+    '''Bulk upload multiple labs and pods'''
+
     if file.content_type not in ("application/json", "text/json"):
         raise HTTPException(status_code=400, detail="File must be JSON")
 

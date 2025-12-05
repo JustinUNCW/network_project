@@ -1,11 +1,12 @@
+from ipaddress import IPv4Address, IPv4Network
 from pydantic import BaseModel
 
 class Network(BaseModel):
-    network: str
-    gateway: str
+    network: IPv4Network
+    gateway: IPv4Address
 
 class Interface(BaseModel):
-    address: str
+    address: IPv4Address
     parent: Network
 
 class Port(BaseModel):
@@ -19,6 +20,7 @@ class AccessMethod(BaseModel):
     url: str
 
 class Device(BaseModel):
+    id: str
     name: str
     description: str
     accessMethods: list[AccessMethod]
