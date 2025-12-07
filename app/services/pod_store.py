@@ -1,27 +1,37 @@
 from ipaddress import IPv4Address
 from typing import Dict, Optional
 from app.models.pod_model import Pod, Device, Network, Location, AccessMethod
-
+from app.Exceptions.exceptions import *
 
 class PodDB:
     def __init__(self):
         # lab_id -> pod_id -> Pod
         self.pods_by_id: Dict[str, Dict[str, Pod]] = {}
-        # lab_id -> pod_id -> list[IPv4Address]
-        self.pod_ip_list: Dict[str, Dict[str, list[IPv4Address]]] = {}
+        # lab_id -> pod_id -> set[IPv4Address]
+        self.pod_ip_list: Dict[str, Dict[str, set[IPv4Address]]] = {}
 
     # ---------- internal helpers ----------
 
-    def _get_pod_or_none(self, lab_id: str, pod_id: str) -> Optional[Pod]:
-        lab_pods = self.pods_by_id.get(lab_id)
-        if lab_pods is None:
-            return None
-        return lab_pods.get(pod_id)
+    def _init_lab_pods(self, lab_id: str) -> None: 
+        self.pods_by_id.setdefault(lab_id, {})
+        self.pod_ip_list.setdefault(lab_id, {})
 
-    def _get_ip_list(self, lab_id: str, pod_id: str) -> list[IPv4Address]:
-        """Ensure nested dicts exist and return the IP list for this pod."""
-        lab_map = self.pod_ip_list.setdefault(lab_id, {})
-        return lab_map.setdefault(pod_id, [])
+    def _get_pod_or_error(self, lab_id: str, pod_id: str) -> Pod:
+        """Return Pod or raise a domain error."""
+        try:
+            lab_pods = self.pods_by_id[lab_id]
+        except KeyError:
+            raise LabNotFoundError(f"Lab {lab_id} not found")
+
+        try:
+            return lab_pods[pod_id]
+        except KeyError:
+            raise PodNotFoundError(f"Pod {pod_id} not found in lab {lab_id}")
+
+    def _get_ip_set(self, lab_id: str, pod_id: str) -> set[IPv4Address]:
+        """Ensure nested dicts exist and return the IP set for this pod."""
+        
+        return self.pod_ip_list.setdefault(lab_id, {}).setdefault(pod_id, set())
 
     def _track_pod_ip_addresses(
         self,
@@ -35,83 +45,114 @@ class PodDB:
         - If ip is None: rebuild from pod.assets or pod_override.assets
         - If ip is not None: check if it's already used, and record it if not.
         """
-        pod = pod_override or self._get_pod_or_none(lab_id, pod_id)
-        if pod is None:
-            return False
+        pod = pod_override or self._get_pod_or_error(lab_id, pod_id)
 
-        ip_list = self._get_ip_list(lab_id, pod_id)
+        ip_set = self._get_ip_set(lab_id, pod_id)
 
         # Full rebuild: check all devices' primary IPs for duplicates
         if ip is None:
-            ip_list.clear()
+            ip_set.clear()
             for device in pod.assets:
                 if not device.ports:
                     continue
                 addr = device.ports[0].interface.address
-                if addr in ip_list:
+                if addr in ip_set:
                     return False
-                ip_list.append(addr)
+                ip_set.add(addr)
             return True
 
         # Single IP add
-        if ip in ip_list:
+        if ip in ip_set:
             return False
-        ip_list.append(ip)
+        ip_set.add(ip)
         return True
 
-    # ---------- read methods ----------
+    # ---------- get methods ----------
 
-    def get_pod_by_id(self, lab_id: str, pod_id: str) -> Optional[Pod]:
-        return self._get_pod_or_none(lab_id, pod_id)
+    def get_pod_by_id(self, lab_id: str, pod_id: str) -> Pod:
+        """Return Pod"""
+        return self._get_pod_or_error(lab_id, pod_id)
 
     def get_pod_devices(self, lab_id: str, pod_id: str) -> list[Device]:
-        pod = self._get_pod_or_none(lab_id, pod_id)
-        return pod.assets if pod is not None else []
+        pod = self._get_pod_or_error(lab_id, pod_id)
+        return pod.assets
 
-    def get_pod_device_by_id(self, lab_id: str, pod_id: str, device_id: str) -> Optional[Device]:
-        pod = self._get_pod_or_none(lab_id, pod_id)
-        if pod is None:
-            return None
+    def get_pod_device_by_id(
+        self,
+        lab_id: str,
+        pod_id: str,
+        device_id: str,
+    ) -> Optional[Device]:
+        """Return a Device within a pod, or None if the device_id is not found."""
+        pod = self._get_pod_or_error(lab_id, pod_id)
         for device in pod.assets:
             if device.id == device_id:
                 return device
         return None
 
     def get_pod_location(self, lab_id: str, pod_id: str) -> Optional[Location]:
-        pod = self._get_pod_or_none(lab_id, pod_id)
-        if pod is None or not pod.assets:
+        """Return derived pod location (first device's location), or None."""
+        pod = self._get_pod_or_error(lab_id, pod_id)
+        if not pod.assets:
             return None
         return pod.assets[0].location
 
     def get_pod_network(self, lab_id: str, pod_id: str) -> Optional[Network]:
-        pod = self._get_pod_or_none(lab_id, pod_id)
-        if pod is None or not pod.assets:
+        """Return derived pod network (first device's first port's parent), or None."""
+        pod = self._get_pod_or_error(lab_id, pod_id)
+        if not pod.assets:
             return None
         first_device = pod.assets[0]
         if not first_device.ports:
             return None
         return first_device.ports[0].interface.parent
 
-    # ---------- write methods ----------
+    def get_all_pod_ip(self, lab_id: str, pod_id: str) -> list[IPv4Address]:
+        """Return all IPs used in this pod (sorted)."""
+        self._get_pod_or_error(lab_id, pod_id)
+        return sorted(self._get_ip_set(lab_id, pod_id))
+
+    def get_free_pod_ip(self, lab_id: str, pod_id: str) -> list[IPv4Address]:
+        """Return all unused IPs in the pod's network."""
+        self._get_pod_or_error(lab_id, pod_id)
+
+        net = self.get_pod_network(lab_id, pod_id)
+        if net is None:
+            return []
+
+        usable = set(net.hosts())
+        used = set(self.get_all_pod_ip(lab_id, pod_id))
+
+        return sorted(usable - used)
+
+    # ---------- post methods ----------
 
     def create_pod(self, lab_id: str, pod: Pod) -> bool:
-        """Create a pod entry under a lab."""
+        """Create a pod entry under a lab.
+
+        Raises:
+            PodAlreadyExists
+            DuplicateIPv4Error
+        """
         lab_pods = self.pods_by_id.setdefault(lab_id, {})
         if pod.id in lab_pods:
-            return False   # pod_id already exists
+            raise PodAlreadyExists(f"{pod.id} already exists")
 
         # Check all IPs for duplicates before storing pod
         if not self._track_pod_ip_addresses(lab_id, pod.id, ip=None, pod_override=pod):
-            return False
+            raise DuplicateIPv4Error("Duplicate IPv4 addresses not allowed")
 
         lab_pods[pod.id] = pod
         return True
 
     def create_device(self, lab_id: str, pod_id: str, device: Device) -> bool:
-        """Create a new device within a pod. Returns False if pod not found or IP duplicate."""
-        pod = self._get_pod_or_none(lab_id, pod_id)
-        if pod is None:
-            return False
+        """Create a new device within a pod.
+
+        Returns:
+            True if created.
+            False if the new device's primary IP would clash with an existing IP.
+        """
+        pod = self._get_pod_or_error(lab_id, pod_id)
 
         if device.ports:
             new_ip = device.ports[0].interface.address
@@ -121,8 +162,15 @@ class PodDB:
         pod.assets.append(device)
         return True
 
-    def update_pod(self, lab_id: str, pod: Pod) -> bool:
-        """Replace a pod by id."""
+    # ---------- put methods ----------
+
+    def put_pod(self, lab_id: str, pod: Pod) -> bool:
+        """Replace a pod by id, creating the lab if missing.
+
+        Returns:
+            True if replaced/created.
+            False if IPs in the new pod are internally duplicated.
+        """
         # Check IPs using the new pod definition first
         if not self._track_pod_ip_addresses(lab_id, pod.id, ip=None, pod_override=pod):
             return False
@@ -131,11 +179,22 @@ class PodDB:
         lab_pods[pod.id] = pod
         return True
 
-    def update_device_ip(self, lab_id: str, pod_id: str, device_id: str, ip: IPv4Address) -> bool:
-        """Update a pod device's IP address. Returns True if updated, False otherwise."""
-        pod = self._get_pod_or_none(lab_id, pod_id)
-        if pod is None:
-            return False
+    # ---------- patch methods ----------
+
+    def patch_device_ip(
+        self,
+        lab_id: str,
+        pod_id: str,
+        device_id: str,
+        ip: IPv4Address,
+    ) -> bool:
+        """Update a pod device's IP address.
+
+        Returns:
+            True if updated (or unchanged).
+            False if the new IP would clash or the device/ports are missing.
+        """
+        self._get_pod_or_error(lab_id, pod_id)
 
         device = self.get_pod_device_by_id(lab_id, pod_id, device_id)
         if device is None or not device.ports:
@@ -143,7 +202,7 @@ class PodDB:
 
         current_ip = device.ports[0].interface.address
 
-        # No change: trivially okay
+        # No change
         if ip == current_ip:
             return True
 
@@ -153,47 +212,110 @@ class PodDB:
 
         # Update device IP and clean up old IP in index
         device.ports[0].interface.address = ip
-        ip_list = self._get_ip_list(lab_id, pod_id)
-        try:
-            ip_list.remove(current_ip)
-        except ValueError:
-            # If it's somehow missing, just ignore
-            pass
+        ip_set = self._get_ip_set(lab_id, pod_id)
+        # discard avoids ValueError if it's missing
+        ip_set.discard(current_ip)
         return True
 
-    def update_device_name(self, lab_id: str, pod_id: str, device_id: str, name: str) -> bool:
+    def patch_device_name(
+        self,
+        lab_id: str,
+        pod_id: str,
+        device_id: str,
+        name: str,
+    ) -> bool:
+        """Patch a device's name."""
+
+        self._get_pod_or_error(lab_id, pod_id)
+
         device = self.get_pod_device_by_id(lab_id, pod_id, device_id)
         if device is None:
             return False
         device.name = name
         return True
 
-    def update_device_access_method(
+    def patch_device_access_method(
         self,
         lab_id: str,
         pod_id: str,
         device_id: str,
         access_method: AccessMethod,
     ) -> bool:
+        """Patch a device's first access method."""
+        self._get_pod_or_error(lab_id, pod_id)
+
         device = self.get_pod_device_by_id(lab_id, pod_id, device_id)
         if device is None or not device.accessMethods:
             return False
         device.accessMethods[0] = access_method
         return True
 
-    def update_pod_devices_network(self, lab_id: str, pod_id: str, network: Network) -> bool:
-        pod = self._get_pod_or_none(lab_id, pod_id)
-        if pod is None:
-            return False
+    def patch_pod_devices_network(
+        self,
+        lab_id: str,
+        pod_id: str,
+        network: Network,
+    ) -> bool:
+        """Patch all devices in a pod to use the given network."""
+        pod = self._get_pod_or_error(lab_id, pod_id)
         for device in pod.assets:
             for port in device.ports:
                 port.interface.parent = network
         return True
 
-    def update_pod_devices_location(self, lab_id: str, pod_id: str, location: Location) -> bool:
-        pod = self._get_pod_or_none(lab_id, pod_id)
-        if pod is None:
-            return False
+    def patch_pod_devices_location(
+        self,
+        lab_id: str,
+        pod_id: str,
+        location: Location,
+    ) -> bool:
+        """Patch all devices in a pod to share the same location."""
+        pod = self._get_pod_or_error(lab_id, pod_id)
         for device in pod.assets:
             device.location = location
+        return True
+
+    # ---------- delete methods ----------
+
+    def delete_lab_and_pod(
+            self, 
+            lab_id: str
+    ) -> bool:
+        """delete a lab and it's pods"""
+        lab = self.pods_by_id.get(lab_id)
+        if lab is None: 
+            raise LabNotFoundError({"detail": f"Lab {lab_id} not found"})
+        del self.pods_by_id[lab_id]
+        del self.pod_ip_list[lab_id]
+        return True
+    
+    def delete_pod(
+        self, 
+        lab_id: str,
+        pod_id: str
+    ) -> bool:
+        """delete a pod"""
+        self._get_pod_or_error(lab_id, pod_id)
+        del self.pods_by_id[lab_id][pod_id]
+        del self.pod_ip_list[lab_id][pod_id]
+        return True
+    
+    def delete_device(
+            self, 
+            lab_id: str, 
+            pod_id: str, 
+            device_id: str
+    ) -> bool:
+        """delete a device from a pod"""
+        pod = self._get_pod_or_error(lab_id, pod_id)
+
+        device = self.get_pod_device_by_id(lab_id, pod_id, device_id)
+        addr =device.ports[0].interface.address
+
+        pod_addresses = self._get_ip_set(lab_id, pod_id)
+        if addr in pod_addresses:
+            pod_addresses.remove(addr)
+
+        pod.assets = [d for d in pod.assets if d.id != device_id]
+
         return True
