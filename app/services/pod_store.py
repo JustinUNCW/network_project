@@ -1,103 +1,237 @@
+from uuid import uuid4
 from ipaddress import IPv4Address
-from typing import Dict, Optional
-from app.models.pod_model import Pod, Device, Network, Location, AccessMethod
+from typing import Dict
+from app.models.pod_model import *
 from app.Exceptions.exceptions import *
+
 
 class PodDB:
     def __init__(self):
         # lab_id -> pod_id -> Pod
-        self.pods_by_id: Dict[str, Dict[str, Pod]] = {}
+        self.pods_by_id: Dict[str, Dict[str, PodExists]] = {}
         # lab_id -> pod_id -> set[IPv4Address]
         self.pod_ip_list: Dict[str, Dict[str, set[IPv4Address]]] = {}
 
     # ---------- internal helpers ----------
 
-    def _init_lab_pods(self, lab_id: str) -> None: 
+    def _init_pod(self, lab_id: str) -> str:
+        """Initialize a pod in pods_by_id and pod_ip_list db's.
+
+        Args:
+            lab_id: Identifier of the lab to place the pod in. 
+
+        Returns:
+            a UUID representing the pod id.
+    """
+        pod_id = str(uuid4())
+        self.pods_by_id.get(lab_id).setdefault(pod_id, {})
+        self.pod_ip_list.get(lab_id).setdefault(pod_id, set())
+        return pod_id
+    
+    def _init_device(self) -> str: 
+        """Initialize a pod in pods_by_id and pod_ip_list db's.
+
+        Args:
+            lab_id: Identifier of the lab to place the pod in. 
+
+        Returns:
+            a UUID representing the pod id.
+    """
+        device_id = str(uuid4())
+
+        return device_id
+
+    def _init_lab(self) -> str: 
+        """Initialize a lab in pods_by_id and pod_ip_list db's.
+
+        Returns:
+            a UUID representing the lab id.
+    """
+        lab_id = str(uuid4())
         self.pods_by_id.setdefault(lab_id, {})
         self.pod_ip_list.setdefault(lab_id, {})
+        return lab_id
+    
+    def _get_device_or_error(self, assets, device_id: str) -> DeviceCreate:
+        """Initialize a lab in pods_by_id and pod_ip_list db's.
+        Args: 
+            assets: A pods devices
+            device_id: A device identifier
 
-    def _get_pod_or_error(self, lab_id: str, pod_id: str) -> Pod:
-        """Return Pod or raise a domain error."""
-        try:
-            lab_pods = self.pods_by_id[lab_id]
+        Returns:
+            a DeviceCreate object
+        """
+        try: 
+           return assets[device_id]
         except KeyError:
-            raise LabNotFoundError(f"Lab {lab_id} not found")
+            raise DeviceNotFoundError({'detail': f'Device {device_id} not found'})
+
+    def _get_lab_or_error(self, lab_id) -> Dict:
+        """Check if a lab exists and return it.
+
+        Args:
+            lab_id: Identifier of the lab.
+
+        Returns:
+            A pod object. 
+
+        Raises:
+            LabNotFoundError: If the lab does not exist.
+        """
+        try:
+            lab = self.pods_by_id[lab_id]
+            return lab
+        except KeyError:
+            raise LabNotFoundError({'detail': f"Lab {lab_id} not found"})
+
+    def _get_pod_or_error(self, lab_id: str, pod_id: str) -> PodCreate:
+        """Check if a pod exists and return it.
+
+        Args:
+            lab_id: Identifier of the lab.
+            pod_id: Identifier of the pod
+
+        Returns:
+            A PodExists object. 
+
+        Raises:
+            LabNotFoundError: If the lab does not exist.
+            PodNotFoundError: If the pod does not exist.
+        """
+        lab_pods = self._get_lab_or_error(lab_id)
 
         try:
             return lab_pods[pod_id]
         except KeyError:
-            raise PodNotFoundError(f"Pod {pod_id} not found in lab {lab_id}")
+            raise PodNotFoundError({'detail': f"Pod {pod_id} not found"})
 
     def _get_ip_set(self, lab_id: str, pod_id: str) -> set[IPv4Address]:
-        """Ensure nested dicts exist and return the IP set for this pod."""
-        
-        return self.pod_ip_list.setdefault(lab_id, {}).setdefault(pod_id, set())
+        """Return a pods list of used ip's.
+
+        Args:
+            lab_id: Identifier of the lab.
+            pod_id: Identifier of the pod
+
+        Returns:
+            A set of IPv4Addresses
+        """
+        return self.pod_ip_list[lab_id][pod_id]
 
     def _track_pod_ip_addresses(
         self,
-        lab_id: str,
-        pod_id: str,
+        lab_id: str | None = None,
+        pod_id: str | None = None,
         ip: IPv4Address | None = None,
-        pod_override: Pod | None = None,
-    ) -> bool:
-        """
-        Helper to keep track of used IPs for a pod.
-        - If ip is None: rebuild from pod.assets or pod_override.assets
-        - If ip is not None: check if it's already used, and record it if not.
-        """
-        pod = pod_override or self._get_pod_or_error(lab_id, pod_id)
+        assets: list[DeviceCreate] | None = None,
+    ):
+        """Check if a newly created pod has duplicate IP's or if a singular IP
+        for a newly created device for a pod has a duplicate IP. 
 
-        ip_set = self._get_ip_set(lab_id, pod_id)
+        Args:
+            lab_id: Identifier of the lab.
+            pod_id: Identifier of the pod
+            ip: the IP for a newly created device
+            assets: a list of pod devices
 
+        Returns:
+            bool 
+
+        Raises:
+            LabNotFoundError: If the lab does not exist.
+            PodNotFoundError: If the pod does not exist.
+            DuplicateIPv4Error: If a pod device has a duplicate IP
+        """
+        temp_ip_set = set()
+        
         # Full rebuild: check all devices' primary IPs for duplicates
         if ip is None:
-            ip_set.clear()
-            for device in pod.assets:
+            for device in assets:
                 if not device.ports:
                     continue
                 addr = device.ports[0].interface.address
-                if addr in ip_set:
-                    return False
-                ip_set.add(addr)
-            return True
+                if addr in temp_ip_set:
+                    DuplicateIPv4Error("Duplicate IPv4 addresses not allowed")
+                temp_ip_set.add(addr)
+            
+            return temp_ip_set
+            
+        
+        ip_set = self._get_ip_set(lab_id, pod_id)
 
         # Single IP add
         if ip in ip_set:
-            return False
-        ip_set.add(ip)
-        return True
+            raise DuplicateIPv4Error("Duplicate IPv4 addresses not allowed")
+
 
     # ---------- get methods ----------
 
-    def get_pod_by_id(self, lab_id: str, pod_id: str) -> Pod:
-        """Return Pod"""
-        return self._get_pod_or_error(lab_id, pod_id)
+    def get_pod_by_id(self, lab_id: str, pod_id: str) -> PodExists:
+        """Get a pod
 
-    def get_pod_devices(self, lab_id: str, pod_id: str) -> list[Device]:
+        Args:
+            lab_id: Identifier of the lab.
+            pod_id: Identifier of the pod
+
+        Returns:
+            A PodExists object 
+
+        Raises:
+            LabNotFoundError: If the lab does not exist.
+            PodNotFoundError: If the pod does not exist.
+        """
         pod = self._get_pod_or_error(lab_id, pod_id)
-        return pod.assets
+        return PodExists(id=pod_id, 
+                         assets=[
+                             DeviceExists(id=device_id, 
+                                          **device.model_dump())
+                         for device_id, device in pod['assets'].items()
+                         ]
+                         )
+
+    def get_pod_devices(self, lab_id: str, pod_id: str) -> list[DeviceExists]:
+        """Get a pods devices
+
+        Args:
+            lab_id: Identifier of the lab.
+            pod_id: Identifier of the pod
+
+        Returns:
+            A list of DeviceExists objects
+
+        Raises:
+            LabNotFoundError: If the lab does not exist.
+            PodNotFoundError: If the pod does not exist.
+        """
+        pod = self._get_pod_or_error(lab_id, pod_id)
+        return [DeviceExists(id=device_id, **device.model_dump())
+                for device_id, device in pod.assets.items()
+                ]
 
     def get_pod_device_by_id(
         self,
         lab_id: str,
         pod_id: str,
         device_id: str,
-    ) -> Optional[Device]:
-        """Return a Device within a pod, or None if the device_id is not found."""
-        pod = self._get_pod_or_error(lab_id, pod_id)
-        for device in pod.assets:
-            if device.id == device_id:
-                return device
-        return None
+    ) -> DeviceExists:
+        """Get a pod device
 
-    def get_pod_location(self, lab_id: str, pod_id: str) -> Optional[Location]:
-        """Return derived pod location (first device's location), or None."""
-        pod = self._get_pod_or_error(lab_id, pod_id)
-        if not pod.assets:
-            return None
-        return pod.assets[0].location
+        Args:
+            lab_id: Identifier of the lab.
+            pod_id: Identifier of the pod
+            device_id: Identifier of a pod device
 
-    def get_pod_network(self, lab_id: str, pod_id: str) -> Optional[Network]:
+        Returns:
+            A DeviceExists object
+
+        Raises:
+            LabNotFoundError: If the lab does not exist.
+            PodNotFoundError: If the pod does not exist.
+        """
+        pod = self._get_pod_or_error(lab_id, pod_id)
+        device = self._get_device_or_error(pod.assets, device_id)
+        return DeviceExists(id=device_id, **device.model_dump())
+
+    def get_pod_network(self, lab_id: str, pod_id: str) -> Network:
         """Return derived pod network (first device's first port's parent), or None."""
         pod = self._get_pod_or_error(lab_id, pod_id)
         if not pod.assets:
@@ -109,14 +243,12 @@ class PodDB:
 
     def get_all_pod_ip(self, lab_id: str, pod_id: str) -> list[IPv4Address]:
         """Return all IPs used in this pod (sorted)."""
-        self._get_pod_or_error(lab_id, pod_id)
         return sorted(self._get_ip_set(lab_id, pod_id))
 
     def get_free_pod_ip(self, lab_id: str, pod_id: str) -> list[IPv4Address]:
         """Return all unused IPs in the pod's network."""
-        self._get_pod_or_error(lab_id, pod_id)
 
-        net = self.get_pod_network(lab_id, pod_id)
+        net:IPv4Network = self.get_pod_network(lab_id, pod_id)
         if net is None:
             return []
 
@@ -127,57 +259,51 @@ class PodDB:
 
     # ---------- post methods ----------
 
-    def create_pod(self, lab_id: str, pod: Pod) -> bool:
+    def create_pod(self, lab_id: str, pod: PodCreate) -> DeviceExists:
         """Create a pod entry under a lab.
 
         Raises:
-            PodAlreadyExists
+            LabNotFoundError
             DuplicateIPv4Error
         """
-        lab_pods = self.pods_by_id.setdefault(lab_id, {})
-        if pod.id in lab_pods:
-            raise PodAlreadyExists(f"{pod.id} already exists")
+        lab_pods = self._get_lab_or_error(lab_id)
 
-        # Check all IPs for duplicates before storing pod
-        if not self._track_pod_ip_addresses(lab_id, pod.id, ip=None, pod_override=pod):
-            raise DuplicateIPv4Error("Duplicate IPv4 addresses not allowed")
+        pod_id = self._init_pod(lab_id)
 
-        lab_pods[pod.id] = pod
-        return True
+        lab_pods[pod_id]['assets'] = {}
 
-    def create_device(self, lab_id: str, pod_id: str, device: Device) -> bool:
+        list_of_devices = []
+
+        for device in pod.assets: 
+            device_exists = self.create_device(lab_id, pod_id, device)
+            list_of_devices.append(device_exists)
+            lab_pods[pod_id]['assets'][device_exists.id] = device
+
+        return PodExists(id=pod_id, 
+                         assets=list_of_devices
+                         )
+    
+    def create_device(self, lab_id: str, pod_id: str, device: DeviceCreate) -> DeviceExists:
         """Create a new device within a pod.
 
         Returns:
-            True if created.
-            False if the new device's primary IP would clash with an existing IP.
+            A DeviceExists object
+
+        Raises: 
+            LabNotFoundError
+            PodNotFoundError
+            DuplicateIPv4Error
         """
-        pod = self._get_pod_or_error(lab_id, pod_id)
+        pod: PodCreate = self._get_pod_or_error(lab_id, pod_id)
 
         if device.ports:
             new_ip = device.ports[0].interface.address
-            if not self._track_pod_ip_addresses(lab_id, pod_id, ip=new_ip):
-                return False
+            self._track_pod_ip_addresses(lab_id=lab_id, pod_id=pod_id, ip=new_ip)
+            self.pod_ip_list[lab_id][pod_id].add(new_ip)
+        
+        device_id = self._init_device()
 
-        pod.assets.append(device)
-        return True
-
-    # ---------- put methods ----------
-
-    def put_pod(self, lab_id: str, pod: Pod) -> bool:
-        """Replace a pod by id, creating the lab if missing.
-
-        Returns:
-            True if replaced/created.
-            False if IPs in the new pod are internally duplicated.
-        """
-        # Check IPs using the new pod definition first
-        if not self._track_pod_ip_addresses(lab_id, pod.id, ip=None, pod_override=pod):
-            return False
-
-        lab_pods = self.pods_by_id.setdefault(lab_id, {})
-        lab_pods[pod.id] = pod
-        return True
+        return DeviceExists(id=device_id, **device.model_dump())
 
     # ---------- patch methods ----------
 
@@ -187,17 +313,16 @@ class PodDB:
         pod_id: str,
         device_id: str,
         ip: IPv4Address,
-    ) -> bool:
+    ) -> DeviceExists:
         """Update a pod device's IP address.
 
         Returns:
             True if updated (or unchanged).
             False if the new IP would clash or the device/ports are missing.
         """
-        self._get_pod_or_error(lab_id, pod_id)
 
         device = self.get_pod_device_by_id(lab_id, pod_id, device_id)
-        if device is None or not device.ports:
+        if not device.ports:
             return False
 
         current_ip = device.ports[0].interface.address
@@ -207,15 +332,14 @@ class PodDB:
             return True
 
         # Check if new IP is free for this pod
-        if not self._track_pod_ip_addresses(lab_id, pod_id, ip):
-            return False
+        self._track_pod_ip_addresses(lab_id, pod_id, ip)
 
         # Update device IP and clean up old IP in index
         device.ports[0].interface.address = ip
         ip_set = self._get_ip_set(lab_id, pod_id)
         # discard avoids ValueError if it's missing
         ip_set.discard(current_ip)
-        return True
+        return DeviceExists(id=device_id, **device.model_dump())
 
     def patch_device_name(
         self,
@@ -223,16 +347,16 @@ class PodDB:
         pod_id: str,
         device_id: str,
         name: str,
-    ) -> bool:
+    ) -> DeviceExists:
         """Patch a device's name."""
 
-        self._get_pod_or_error(lab_id, pod_id)
+        pod = self._get_pod_or_error(lab_id, pod_id)
 
-        device = self.get_pod_device_by_id(lab_id, pod_id, device_id)
-        if device is None:
-            return False
+        device = self._get_device_or_error(pod.assets, device_id)
+
         device.name = name
-        return True
+
+        return DeviceExists(id=device_id, **device.model_dump())
 
     def patch_device_access_method(
         self,
@@ -240,40 +364,44 @@ class PodDB:
         pod_id: str,
         device_id: str,
         access_method: AccessMethod,
-    ) -> bool:
+    ) -> DeviceExists:
         """Patch a device's first access method."""
-        self._get_pod_or_error(lab_id, pod_id)
+        pod = self._get_pod_or_error(lab_id, pod_id)
 
-        device = self.get_pod_device_by_id(lab_id, pod_id, device_id)
-        if device is None or not device.accessMethods:
-            return False
+        device = self._get_device_or_error(pod.assets, device_id)
+
         device.accessMethods[0] = access_method
-        return True
+
+        return DeviceExists(id=device_id, **device.model_dump())
 
     def patch_pod_devices_network(
         self,
         lab_id: str,
         pod_id: str,
         network: Network,
-    ) -> bool:
+    ) -> list[DeviceExists]:
         """Patch all devices in a pod to use the given network."""
         pod = self._get_pod_or_error(lab_id, pod_id)
-        for device in pod.assets:
+        for device in pod.assets.keys():
             for port in device.ports:
                 port.interface.parent = network
-        return True
+        return [DeviceExists(id=device_id, 
+                            **device.model_dump())
+                            for device_id, device in pod.assets.items()]
 
     def patch_pod_devices_location(
         self,
         lab_id: str,
         pod_id: str,
         location: Location,
-    ) -> bool:
+    ) -> list[DeviceExists]:
         """Patch all devices in a pod to share the same location."""
         pod = self._get_pod_or_error(lab_id, pod_id)
-        for device in pod.assets:
+        for device in pod.assets.keys():
             device.location = location
-        return True
+        return [DeviceExists(id=device_id, 
+                            **device.model_dump())
+                            for device_id, device in pod.assets.items()]
 
     # ---------- delete methods ----------
 
@@ -282,9 +410,7 @@ class PodDB:
             lab_id: str
     ) -> bool:
         """delete a lab and it's pods"""
-        lab = self.pods_by_id.get(lab_id)
-        if lab is None: 
-            raise LabNotFoundError({"detail": f"Lab {lab_id} not found"})
+        self._get_lab_or_error(lab_id)
         del self.pods_by_id[lab_id]
         del self.pod_ip_list[lab_id]
         return True
@@ -309,13 +435,11 @@ class PodDB:
         """delete a device from a pod"""
         pod = self._get_pod_or_error(lab_id, pod_id)
 
-        device = self.get_pod_device_by_id(lab_id, pod_id, device_id)
-        addr =device.ports[0].interface.address
+        device = self._get_device_or_error(pod.assets, device_id)
+        addr = device.ports[0].interface.address
+        
+        del pod.assets[device_id]
 
-        pod_addresses = self._get_ip_set(lab_id, pod_id)
-        if addr in pod_addresses:
-            pod_addresses.remove(addr)
-
-        pod.assets = [d for d in pod.assets if d.id != device_id]
+        self._get_ip_set(lab_id, pod_id).remove(addr)
 
         return True

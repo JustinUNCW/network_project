@@ -1,8 +1,21 @@
 from pydantic import BaseModel
+from pydantic.types import StringConstraints
+from typing_extensions import Annotated
 
-class LabMeta(BaseModel):
-    id: str
-    name: str
-    location: str
-    building: str
-    floor: str
+NonEmptyStr = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1)
+]
+
+class LabMetaCreate(BaseModel):
+    name: NonEmptyStr
+    location: NonEmptyStr
+    building: NonEmptyStr
+    floor: NonEmptyStr
+
+class LabMetaExists(BaseModel):
+    id: NonEmptyStr
+    name: NonEmptyStr
+    location: NonEmptyStr
+    building: NonEmptyStr
+    floor: NonEmptyStr

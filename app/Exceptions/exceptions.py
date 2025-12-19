@@ -1,14 +1,14 @@
 class DuplicateIPv4Error(Exception):
     pass
 
-
 class LabNotFoundError(Exception):
     pass
 
+class DeviceNotFoundError(Exception):
+    pass
 
 class PodNotFoundError(Exception):
     pass
-
 
 class PodAlreadyExists(Exception):
     pass

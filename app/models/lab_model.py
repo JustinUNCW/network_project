@@ -1,10 +1,32 @@
-from pydantic import BaseModel
-from app.models.pod_model import Pod
+from typing import Optional
+from pydantic import BaseModel, Field
+from pydantic.types import StringConstraints
+from typing_extensions import Annotated
+from app.models.pod_model import PodExists, PodCreate
 
-class Lab(BaseModel):
-    id: str
-    name: str
-    location: str
-    building: str
-    floor: str
-    pods: list[Pod]
+NonEmptyStr = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1)
+]
+
+
+class LabCreate(BaseModel):
+    name: NonEmptyStr
+    location: NonEmptyStr
+    building: NonEmptyStr
+    floor: NonEmptyStr
+    pods: list[PodCreate]
+
+class LabExists(BaseModel):
+    id: NonEmptyStr
+    name: NonEmptyStr
+    location: NonEmptyStr
+    building: NonEmptyStr
+    floor: NonEmptyStr
+    pods: list[PodExists]
+
+class LabExistsDump(BaseModel):
+    data: Optional[list[LabExists]] =  Field(default_factory=list)
+
+class LabCreateDump(BaseModel):
+    data: Optional[list[LabCreate]] =  Field(default_factory=list)

@@ -1,21 +1,25 @@
-from fastapi import FastAPI
-from app.routers import pods, devices, labs, upload
-from app.services.pod_store import *
-from app.services.lab_store import LabDB
 from fastapi import FastAPI, Request
+from app.routers import pods, devices, labs, upload
 from fastapi.responses import JSONResponse
-
-
+from fastapi.middleware.cors import CORSMiddleware
+from app.Exceptions.exceptions import *
 
 app = FastAPI()
-pod_db = PodDB()
-lab_db = LabDB()
 
-def get_pod_db():
-    return pod_db
+origins = [
+    "http://localhost:5173",  # Vite default
+    "http://127.0.0.1:5173",
+]
 
-def get_lab_db():
-    return lab_db
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],          # or ["*"] for local dev
+    allow_credentials=True,
+    allow_methods=["*"],            # includes OPTIONS, POST, etc.
+    allow_headers=["*"],            # includes Content-Type
+    
+)
+
 
 @app.exception_handler(LabNotFoundError)
 async def lab_not_found_handler(request: Request, exc: LabNotFoundError):
