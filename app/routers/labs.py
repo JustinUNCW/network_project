@@ -13,20 +13,18 @@ router = APIRouter(
 async def get_lab_meta(
     lab_id: str,
     lab_db: LabDB = Depends(get_lab_db)
-) -> dict[str, LabMetaExists]:
+) -> LabMetaExists:
     """Get a Lab by id"""
-    lab = lab_db.get_lab_meta(lab_id)
-    return {'lab': LabMetaExists(id=lab_id, **lab.model_dump())}
+    return lab_db.get_lab_meta(lab_id)
 
 @router.put("/{lab_id}/replace",  status_code=201)
 async def update_lab_meta(
     lab_id: str,
     lab: LabMetaCreate,
     lab_db: LabDB = Depends(get_lab_db),
-) -> dict[str, LabMetaExists]:
+) -> LabMetaExists:
     """Replace the lab's data (excluding pods)"""
-    lab = lab_db.put_lab_meta(lab_id, lab)  
-    return {"lab": lab}
+    return lab_db.put_lab_meta(lab_id, lab)  
 
 @router.post("/create", status_code=201)
 async def create_lab_meta(

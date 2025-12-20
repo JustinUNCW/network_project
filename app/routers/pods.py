@@ -21,7 +21,7 @@ async def get_pod(lab_id: str,
 async def get_pod(lab_id: str, 
                   pod_id: str, 
                   pod_db: PodDB = Depends(get_pod_db)
-                  ) -> Network:
+                  ) -> IPv4Network:
     '''Get a pods network'''
     return pod_db.get_pod_network(lab_id, pod_id)
      

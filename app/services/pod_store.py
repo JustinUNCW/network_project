@@ -53,7 +53,7 @@ class PodDB:
         return lab_id
     
     def _get_device_or_error(self, assets, device_id: str) -> DeviceCreate:
-        """Initialize a lab in pods_by_id and pod_ip_list db's.
+        """Return a pods existing device by id.
         Args: 
             assets: A pods devices
             device_id: A device identifier
@@ -84,7 +84,7 @@ class PodDB:
         except KeyError:
             raise LabNotFoundError({'detail': f"Lab {lab_id} not found"})
 
-    def _get_pod_or_error(self, lab_id: str, pod_id: str) -> PodCreate:
+    def _get_pod_or_error(self, lab_id: str, pod_id: str) -> dict[str, dict[str, DeviceExists]]:
         """Check if a pod exists and return it.
 
         Args:
@@ -182,11 +182,8 @@ class PodDB:
         pod = self._get_pod_or_error(lab_id, pod_id)
         return PodExists(id=pod_id, 
                          assets=[
-                             DeviceExists(id=device_id, 
-                                          **device.model_dump())
-                         for device_id, device in pod['assets'].items()
-                         ]
-                         )
+                             DeviceExists.model_validate({'id': device_id, **device})
+                         for device_id, device in pod['assets'].items()])
 
     def get_pod_devices(self, lab_id: str, pod_id: str) -> list[DeviceExists]:
         """Get a pods devices
@@ -203,9 +200,8 @@ class PodDB:
             PodNotFoundError: If the pod does not exist.
         """
         pod = self._get_pod_or_error(lab_id, pod_id)
-        return [DeviceExists(id=device_id, **device.model_dump())
-                for device_id, device in pod.assets.items()
-                ]
+        return [DeviceExists.model_validate({'id': device_id, **device})
+                         for device_id, device in pod['assets'].items()]
 
     def get_pod_device_by_id(
         self,
@@ -228,18 +224,18 @@ class PodDB:
             PodNotFoundError: If the pod does not exist.
         """
         pod = self._get_pod_or_error(lab_id, pod_id)
-        device = self._get_device_or_error(pod.assets, device_id)
-        return DeviceExists(id=device_id, **device.model_dump())
+        device = self._get_device_or_error(pod['assets'], device_id)
+        return DeviceExists.model_validate({'id': device_id, **device})
 
-    def get_pod_network(self, lab_id: str, pod_id: str) -> Network:
+    def get_pod_network(self, lab_id: str, pod_id: str) -> IPv4Network:
         """Return derived pod network (first device's first port's parent), or None."""
         pod = self._get_pod_or_error(lab_id, pod_id)
-        if not pod.assets:
+        if pod.get('assets') == []:
             return None
-        first_device = pod.assets[0]
-        if not first_device.ports:
+        first_device = next(iter(pod['assets'].values()))
+        if not first_device['ports']:
             return None
-        return first_device.ports[0].interface.parent
+        return first_device['ports'][0]['interface']['parent']['network']
 
     def get_all_pod_ip(self, lab_id: str, pod_id: str) -> list[IPv4Address]:
         """Return all IPs used in this pod (sorted)."""
@@ -277,7 +273,7 @@ class PodDB:
         for device in pod.assets: 
             device_exists = self.create_device(lab_id, pod_id, device)
             list_of_devices.append(device_exists)
-            lab_pods[pod_id]['assets'][device_exists.id] = device
+            lab_pods[pod_id]['assets'][device_exists.id] = device.model_dump()
 
         return PodExists(id=pod_id, 
                          assets=list_of_devices
@@ -303,7 +299,7 @@ class PodDB:
         
         device_id = self._init_device()
 
-        return DeviceExists(id=device_id, **device.model_dump())
+        return DeviceExists.model_validate({'id': device_id, **device})
 
     # ---------- patch methods ----------
 
@@ -325,7 +321,7 @@ class PodDB:
         if not device.ports:
             return False
 
-        current_ip = device.ports[0].interface.address
+        current_ip = device.ports[0]['interface']['address']
 
         # No change
         if ip == current_ip:
@@ -335,11 +331,11 @@ class PodDB:
         self._track_pod_ip_addresses(lab_id, pod_id, ip)
 
         # Update device IP and clean up old IP in index
-        device.ports[0].interface.address = ip
+        device.ports[0]['interface']['address'] = ip
         ip_set = self._get_ip_set(lab_id, pod_id)
         # discard avoids ValueError if it's missing
         ip_set.discard(current_ip)
-        return DeviceExists(id=device_id, **device.model_dump())
+        return DeviceExists.model_validate({'id': device_id, **device})
 
     def patch_device_name(
         self,
@@ -352,11 +348,11 @@ class PodDB:
 
         pod = self._get_pod_or_error(lab_id, pod_id)
 
-        device = self._get_device_or_error(pod.assets, device_id)
+        device = self._get_device_or_error(pod['assets'], device_id)
 
-        device.name = name
+        device[name] = name
 
-        return DeviceExists(id=device_id, **device.model_dump())
+        return DeviceExists.model_validate({'id': device_id, **device})
 
     def patch_device_access_method(
         self,
@@ -368,11 +364,11 @@ class PodDB:
         """Patch a device's first access method."""
         pod = self._get_pod_or_error(lab_id, pod_id)
 
-        device = self._get_device_or_error(pod.assets, device_id)
+        device = self._get_device_or_error(pod['assets'], device_id)
 
-        device.accessMethods[0] = access_method
+        device['accessMethods'][0] = access_method
 
-        return DeviceExists(id=device_id, **device.model_dump())
+        return DeviceExists.model_validate({'id': device_id, **device})
 
     def patch_pod_devices_network(
         self,
@@ -382,13 +378,12 @@ class PodDB:
     ) -> list[DeviceExists]:
         """Patch all devices in a pod to use the given network."""
         pod = self._get_pod_or_error(lab_id, pod_id)
-        for device in pod.assets.keys():
-            for port in device.ports:
-                port.interface.parent = network
-        return [DeviceExists(id=device_id, 
-                            **device.model_dump())
-                            for device_id, device in pod.assets.items()]
-
+        for device in pod['assets'].keys():
+            for port in device['ports']:
+                port['interface']['parent'] = network
+        return [DeviceExists.model_validate({'id': device_id, **device})
+                         for device_id, device in pod['assets'].items()]
+    
     def patch_pod_devices_location(
         self,
         lab_id: str,
@@ -397,11 +392,10 @@ class PodDB:
     ) -> list[DeviceExists]:
         """Patch all devices in a pod to share the same location."""
         pod = self._get_pod_or_error(lab_id, pod_id)
-        for device in pod.assets.keys():
-            device.location = location
-        return [DeviceExists(id=device_id, 
-                            **device.model_dump())
-                            for device_id, device in pod.assets.items()]
+        for device in pod['assets'].keys():
+            device['location'] = location
+        return [DeviceExists.model_validate({'id': device_id, **device})
+                         for device_id, device in pod['assets'].items()]
 
     # ---------- delete methods ----------
 
@@ -435,10 +429,10 @@ class PodDB:
         """delete a device from a pod"""
         pod = self._get_pod_or_error(lab_id, pod_id)
 
-        device = self._get_device_or_error(pod.assets, device_id)
+        device = self._get_device_or_error(pod['assets'], device_id)
         addr = device.ports[0].interface.address
         
-        del pod.assets[device_id]
+        del pod['assets'][device_id]
 
         self._get_ip_set(lab_id, pod_id).remove(addr)
 

@@ -81,7 +81,7 @@ async def update_device_location(lab_id: str,
     device = pod_db.patch_pod_devices_location(lab_id, pod_id, location)
     return {"device": device}
 
-@router.delete("/device/{device_id}/delete")
+@router.delete("/device/{device_id}/delete", tags=['Device'])
 async def delete_device(lab_id: str, 
 pod_id: str, 
 device_id: str, 
